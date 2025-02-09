@@ -101,15 +101,6 @@ namespace DSharpBot
             }
             
         }
-
-        public async Task Resign(DSharpPlus.EventArgs.ComponentInteractionCreatedEventArgs e)
-        {
-            TicTacToeCommand.games.Remove(_player1.Id);
-            TicTacToeCommand.games.Remove(_player2.Id);
-            
-            await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.UpdateMessage,
-            new DiscordInteractionResponseBuilder().WithContent($"{e.User.Username} Resigned!").AsEphemeral());
-        }
         
         public DiscordInteractionResponseBuilder BuildMessage()
         {
@@ -182,7 +173,7 @@ namespace DSharpBot
             return true;
         }
 
-        private DiscordInteractionResponseBuilder EndGame(string message)
+        public DiscordInteractionResponseBuilder EndGame(string message)
         {
             var builder = new DiscordInteractionResponseBuilder().WithContent(message);
 

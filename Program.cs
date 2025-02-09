@@ -18,6 +18,7 @@ namespace DSharpBot
         {   
             
             string? botToken = Environment.GetEnvironmentVariable("TOKEN");
+            
 
             if (botToken is null)
             {
@@ -36,7 +37,11 @@ namespace DSharpBot
                     if (e.Id == "tttDelete")
                     {
                         if (TicTacToeCommand.games.TryGetValue(e.User.Id, out TicTacToeGame? game))
-                            await game.Resign(e);
+                        {
+                            var builder = game.EndGame($"{e.User.Username} resigned.");
+                            await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.UpdateMessage, builder);
+                        }
+                            
                         else
                             await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource, 
                             new DiscordInteractionResponseBuilder().WithContent("You are not in a Tic-Tac-Toe game!").AsEphemeral());
