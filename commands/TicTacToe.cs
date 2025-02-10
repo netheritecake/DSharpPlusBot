@@ -6,13 +6,14 @@ using DSharpPlus.Commands;
 using DSharpPlus.Commands.ArgumentModifiers;
 using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
+using DSharpPlus.Net;
 using Microsoft.Extensions.Options;
 
 namespace DSharpBot
 {
     public class TicTacToeCommand
     {
-        public static Dictionary <ulong, TicTacToeGame> games = [];
+        public static Dictionary <ulong, TicTacToeGame> tttGames = [];
 
         [Command("TicTacToe")]
         [Description("Play TicTacToe")]
@@ -21,24 +22,32 @@ namespace DSharpBot
             
             if (context.User == Opponent)
             {
-                await context.RespondAsync("You can't play against yourself!");
+                var response = new DiscordInteractionResponseBuilder().WithContent("You can't play against yourself.").AsEphemeral();
+                await context.RespondAsync(response);
                 return;
             }
-            if (games.ContainsKey(context.User.Id))
+            if (tttGames.ContainsKey(context.User.Id))
             {
-                await context.RespondAsync("You are already in a game, finish that one first.");
+                var response = new DiscordInteractionResponseBuilder().WithContent("You are already in a game, finish that one first.").AsEphemeral();
+                await context.RespondAsync(response);
                 return;
             }
+            if (tttGames.ContainsKey(Opponent.Id))
+            {
+                var response = new DiscordInteractionResponseBuilder().WithContent("Your opponent is already in a game, finish that one first.").AsEphemeral();
+                await context.RespondAsync(response);
+                return;
+            }
+
             TicTacToeGame game = new(context.User, Opponent);
-            games.Add(context.User.Id, game);
-            games.Add(Opponent.Id, game);
+            tttGames.Add(context.User.Id, game);
+            tttGames.Add(Opponent.Id, game);
 
             var builder = game.BuildMessage();
 
             await context.RespondAsync(builder);
         }
 
-        
     }
 
     public class TicTacToeGame
@@ -189,8 +198,8 @@ namespace DSharpBot
             }
 
             // Remove the game from active games
-            TicTacToeCommand.games.Remove(_player1.Id);
-            TicTacToeCommand.games.Remove(_player2.Id);
+            TicTacToeCommand.tttGames.Remove(_player1.Id);
+            TicTacToeCommand.tttGames.Remove(_player2.Id);
             
             return builder;
         }

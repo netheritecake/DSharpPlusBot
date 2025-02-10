@@ -36,7 +36,7 @@ namespace DSharpBot
                     // TicTacToe button clicks
                     if (e.Id == "tttDelete")
                     {
-                        if (TicTacToeCommand.games.TryGetValue(e.User.Id, out TicTacToeGame? game))
+                        if (TicTacToeCommand.tttGames.TryGetValue(e.User.Id, out TicTacToeGame? game))
                         {
                             var builder = game.EndGame($"{e.User.Username} resigned.");
                             await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.UpdateMessage, builder);
@@ -48,7 +48,7 @@ namespace DSharpBot
                     }
                     else if (e.Id.StartsWith("ttt"))
                     {   
-                        if (TicTacToeCommand.games.TryGetValue(e.User.Id, out TicTacToeGame? game))
+                        if (TicTacToeCommand.tttGames.TryGetValue(e.User.Id, out TicTacToeGame? game))
                             await game.MakeMove(e);
                         else
                             await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource, 
