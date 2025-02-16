@@ -36,9 +36,9 @@ namespace DSharpBot
                     // TicTacToe button clicks
                     if (e.Id == "tttDelete")
                     {
-                        if (TicTacToeCommand.tttGames.TryGetValue(e.User.Id, out TicTacToeGame? game))
+                        if (TicTacToeCommand.tttGames.TryGetValue(e.User.Id, out TicTacToeGame? tttGame))
                         {
-                            var builder = game.EndGame($"{e.User.Username} resigned.");
+                            var builder = tttGame.EndGame($"{e.User.Username} resigned.");
                             await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.UpdateMessage, builder);
                         }
                             
@@ -48,11 +48,21 @@ namespace DSharpBot
                     }
                     else if (e.Id.StartsWith("ttt"))
                     {   
-                        if (TicTacToeCommand.tttGames.TryGetValue(e.User.Id, out TicTacToeGame? game))
-                            await game.MakeMove(e);
+                        if (TicTacToeCommand.tttGames.TryGetValue(e.User.Id, out TicTacToeGame? tttGame))
+                            await tttGame.MakeMove(e);
                         else
                             await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource, 
                             new DiscordInteractionResponseBuilder().WithContent("You are not in a Tic-Tac-Toe game!").AsEphemeral());
+                    }
+
+                    // Minesweeper button clicks
+                    else if (e.Id.StartsWith("ms"))
+                    {   
+                        if (MinesweeperCommand.msGames.TryGetValue(e.User.Id, out MinesweeperGame? msGame))
+                            await msGame.MakeMove(e);
+                        else
+                            await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource, 
+                            new DiscordInteractionResponseBuilder().WithContent("You are not in a Minesweeper game!").AsEphemeral());
                     }
                 })
             );
@@ -60,7 +70,7 @@ namespace DSharpBot
             // Registering the commands
             builder.UseCommands((serviceProvider, extension) => 
             {
-                extension.AddCommands([typeof(PingCommand), typeof(TicTacToeCommand)]);
+                extension.AddCommands([typeof(PingCommand), typeof(TicTacToeCommand), typeof(MinesweeperCommand)]);
                 TextCommandProcessor textCommandProcessor = new(new()
                 {
                     PrefixResolver = new DefaultPrefixResolver(true, "!").ResolvePrefixAsync

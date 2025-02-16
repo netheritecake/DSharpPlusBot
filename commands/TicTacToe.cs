@@ -1,13 +1,7 @@
-using System;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Security;
 using DSharpPlus.Commands;
-using DSharpPlus.Commands.ArgumentModifiers;
 using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
-using DSharpPlus.Net;
-using Microsoft.Extensions.Options;
 
 namespace DSharpBot
 {
@@ -39,12 +33,11 @@ namespace DSharpBot
                 return;
             }
 
-            TicTacToeGame game = new(context.User, Opponent);
-            tttGames.Add(context.User.Id, game);
-            tttGames.Add(Opponent.Id, game);
+            TicTacToeGame tttGame = new(context.User, Opponent);
+            tttGames.Add(context.User.Id, tttGame);
+            tttGames.Add(Opponent.Id, tttGame);
 
-            var builder = game.BuildMessage();
-
+            var builder = tttGame.BuildMessage();
             await context.RespondAsync(builder);
         }
 
@@ -149,7 +142,7 @@ namespace DSharpBot
             return builder;
         }
 
-        public bool CheckWin()
+        private bool CheckWin()
         {
             for (int i = 0; i < 3; i++)
             {   
@@ -168,7 +161,7 @@ namespace DSharpBot
             return false;
         }
 
-        public bool CheckDraw()
+        private bool CheckDraw()
         {
             // if theres an empty spot on the board, that means the game isnt over yet
             for (int i = 0; i < 3; i++)
