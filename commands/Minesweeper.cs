@@ -12,11 +12,20 @@ namespace DSharpBot
         [Description("Start a minesweeper game")]
         public static async ValueTask MinesweeperStart(CommandContext context)
         {
-            MinesweeperGame msGame = new(context.User);
-            msGames.Add(context.User.Id, msGame);
+            if (msGames.ContainsKey(context.User.Id))
+            {
+                var response = new DiscordInteractionResponseBuilder().WithContent("You are already in a game!").AsEphemeral();
+                await context.RespondAsync(response);
+            }
 
-            var builder = msGame.BuildMessage();
-            await context.RespondAsync(builder);
+            else 
+            {
+                MinesweeperGame msGame = new(context.User);
+                msGames.Add(context.User.Id, msGame);
+
+                var builder = msGame.BuildMessage();
+                await context.RespondAsync(builder);
+            }
 
         }
         
@@ -24,7 +33,7 @@ namespace DSharpBot
 
     public class MinesweeperGame
     {
-        private readonly DiscordUser _player1;
+        public readonly DiscordUser _player1;
         private string[,] _board = new string[5,5];
         private bool[,] _isOpen = new bool[5,5];
 
@@ -80,12 +89,12 @@ namespace DSharpBot
                 {
                     if (_isOpen[i, j])
                     {
-                        DiscordComponent button = new DiscordButtonComponent(DiscordButtonStyle.Primary, $"ms{i}{j}", _board[i, j], _isOpen[i, j]);
+                        DiscordComponent button = new DiscordButtonComponent(DiscordButtonStyle.Primary, $"ms{i}{j}.{_player1.Id}", _board[i, j], _isOpen[i, j]);
                         components[j] = button;
                     }
                     else 
                     {
-                        DiscordComponent button = new DiscordButtonComponent(DiscordButtonStyle.Primary, $"ms{i}{j}", "​", _isOpen[i, j]);
+                        DiscordComponent button = new DiscordButtonComponent(DiscordButtonStyle.Primary, $"ms{i}{j}.{_player1.Id}", "​", _isOpen[i, j]);
                         components[j] = button;
                     }
 
@@ -212,7 +221,7 @@ namespace DSharpBot
                 DiscordComponent[] components = new DiscordComponent[5];
                 for (int j = 0; j < 5; j++)
                 {
-                    components[j] = new DiscordButtonComponent(DiscordButtonStyle.Primary, $"ms{i}{j}", _board[i, j], true);
+                    components[j] = new DiscordButtonComponent(DiscordButtonStyle.Primary, $"ms{i}{j}.{_player1.Id}", _board[i, j], true);
                 }
                 builder.AddComponents(components);
             }

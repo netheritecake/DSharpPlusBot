@@ -55,8 +55,7 @@ namespace DSharpBot
         {
             _player1 = player1;
             _player2 = player2;
-            Random random = new Random();
-            _currentPlayer = random.Next(0, 2) == 0 ? _player1 : _player2;
+            _currentPlayer = Random.Shared.Next(0, 2) == 0 ? _player1 : _player2;
             _board = new string[,] 
             {
                 { "​", "​", "​" },

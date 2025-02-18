@@ -1,9 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Security;
-using System.Text;
-using DSharpPlus;
+﻿using DSharpPlus;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.Processors.TextCommands;
 using DSharpPlus.Commands.Processors.TextCommands.Parsing;
@@ -58,8 +53,16 @@ namespace DSharpBot
                     // Minesweeper button clicks
                     else if (e.Id.StartsWith("ms"))
                     {   
+                        var creatorId = e.Id[5..];
                         if (MinesweeperCommand.msGames.TryGetValue(e.User.Id, out MinesweeperGame? msGame))
-                            await msGame.MakeMove(e);
+                        {   
+                            if (creatorId == msGame._player1.Id.ToString())
+                                await msGame.MakeMove(e);
+                            else
+                                await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource, 
+                                new DiscordInteractionResponseBuilder().WithContent("This is NOT your board.").AsEphemeral());
+                        }
+                            
                         else
                             await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource, 
                             new DiscordInteractionResponseBuilder().WithContent("You are not in a Minesweeper game!").AsEphemeral());
